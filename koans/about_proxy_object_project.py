@@ -20,12 +20,34 @@ from runner.koan import *
 
 class Proxy:
     def __init__(self, target_object):
-        # WRITE CODE HERE
-
+        self._messages = []
         #initialize '_obj' attribute last. Trust me on this!
         self._obj = target_object
 
-    # WRITE CODE HERE
+    def __setattr__(self, key, value):
+        if key.startswith("_"):
+            # print("proxy: %s: %s" % (key, value))
+            super(Proxy, self).__setattr__(key, value)
+        else:
+            # print("target: %s: %s" % (key, value))
+            self._messages += [key]
+            setattr(self._obj, key, value)
+
+    def __getattr__(self, item):
+        self._messages += [item]
+        return getattr(self._obj, item)
+
+    def messages(self):
+        return self._messages
+
+    def number_of_times_called(self, item):
+        return len([x for x in self.messages() if x == item])
+
+    def was_called(self, item):
+        return item in self.messages()
+
+    def no_such_method(self):
+        raise AttributeError("No such method on proxy")
 
 # The proxy object should pass the following Koan:
 #
@@ -58,7 +80,6 @@ class AboutProxyObjectProject(Koan):
 
         with self.assertRaises(AttributeError):
             tv.no_such_method()
-
 
     def test_proxy_reports_methods_have_been_called(self):
         tv = Proxy(Television())

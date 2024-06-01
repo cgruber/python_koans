@@ -34,7 +34,7 @@ class AboutMonkeyPatching(Koan):
         except Exception as ex:
             err_msg = ex.args[0]
 
-        self.assertRegex(err_msg, "immutable type")
+        self.assertRegex(err_msg, "can't set attributes")
 
     # ------------------------------------------------------------------
 
